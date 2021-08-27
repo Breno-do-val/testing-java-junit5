@@ -10,6 +10,7 @@ import org.junit.jupiter.api.condition.EnabledOnOs;
 import org.junit.jupiter.api.condition.JRE;
 import org.junit.jupiter.api.condition.OS;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.Assumptions.assumeFalse;
 import static org.junit.jupiter.api.Assumptions.assumeTrue;
@@ -26,6 +27,9 @@ class IndexControllerTest {
     @Test
     void index() {
         assertEquals("index", indexController.index(), "Wrong VIew Returned!");
+
+        // AssertJ
+        assertThat(indexController.index()).isEqualTo("index");
     }
 
     @Test
