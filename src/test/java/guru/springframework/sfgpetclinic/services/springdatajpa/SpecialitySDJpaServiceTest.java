@@ -8,7 +8,9 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import static org.junit.jupiter.api.Assertions.*;
+import java.util.Optional;
+
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -34,5 +36,19 @@ class SpecialitySDJpaServiceTest {
 
         verify(specialtyRepository, atLeastOnce()).deleteById(1l);
         verify(specialtyRepository, never()).deleteById(1L);
+    }
+
+    @Test
+    void findById() {
+        // given
+        Speciality speciality = new Speciality();
+        when(specialtyRepository.findById(1l)).thenReturn((Optional.of(speciality)));
+
+        // when
+        Optional<Speciality> found = specialtyRepository.findById(1L);
+
+        // then
+        assertThat(found).isNotNull();
+        verify(specialtyRepository.findById(1L), times(1));
     }
 }
