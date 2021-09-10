@@ -23,6 +23,6 @@ class VetSDJpaServiceTest {
         service.deleteById(1l);
 
         verify(vetRepository, times(1)).deleteById(1l);
-        verify(vetRepository, never()).deleteById(1L);
+        verify(vetRepository, never()).deleteById(null);
     }
 }
