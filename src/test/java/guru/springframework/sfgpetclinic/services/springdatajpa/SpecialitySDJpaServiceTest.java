@@ -8,9 +8,13 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.HashSet;
 import java.util.Optional;
+import java.util.Set;
 
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -24,40 +28,101 @@ class SpecialitySDJpaServiceTest {
 
     @Test
     void delete() {
-        service.delete(new Speciality());
+        // given
+        Speciality speciality = new Speciality();
 
-        // It verifies if the dependency has been called the number of times expected
-        verify(specialtyRepository, times(1)).delete(new Speciality());
+        // when
+        service.delete(speciality);
+
+        // then
+        then(specialtyRepository).should().delete(any(Speciality.class));
+        then(specialtyRepository).shouldHaveNoMoreInteractions();
     }
 
     @Test
     void deleteByObject() {
+        // given
         Speciality object = new Speciality();
 
+        // when
         service.delete(object);
 
-        verify(specialtyRepository).delete(any(Speciality.class));
+        // then
+        then(specialtyRepository).should().delete(any(Speciality.class));
     }
 
     @Test
     void deleteById() {
+        // given - none
+
+        // when
         service.deleteById(1l);
 
-        verify(specialtyRepository, atLeastOnce()).deleteById(1l);
-        verify(specialtyRepository, never()).deleteById(1L);
+        // then
+        then(specialtyRepository).should(atLeastOnce()).deleteById(anyLong());
+        then(specialtyRepository).should(never()).deleteById(5L);
     }
 
     @Test
     void findById() {
         // given
         Speciality speciality = new Speciality();
-        when(specialtyRepository.findById(1l)).thenReturn((Optional.of(speciality)));
+        given(specialtyRepository.findById(anyLong())).willReturn(Optional.of(speciality));
 
         // when
         Optional<Speciality> found = specialtyRepository.findById(1L);
 
         // then
         assertThat(found).isNotNull();
-        verify(specialtyRepository.findById(1L), times(1));
+        assertThat(found).isInstanceOf(Optional.class);
+        then(specialtyRepository).should().findById(anyLong());
+        then(specialtyRepository).shouldHaveNoMoreInteractions();
+    }
+
+    @Test
+    void findByIdNull() {
+        // given
+        Speciality speciality = new Speciality();
+        given(specialtyRepository.findById(anyLong())).willReturn(null);
+
+        // when
+        Optional<Speciality> found = specialtyRepository.findById(1L);
+
+        // then
+        assertThat(found).isNull();
+        then(specialtyRepository).should().findById(anyLong());
+        then(specialtyRepository).shouldHaveNoMoreInteractions();
+    }
+
+    @Test
+    void findAll() {
+        // given
+        Speciality speciality = new Speciality();
+        Set<Speciality> specialitySet = new HashSet<>();
+        specialitySet.add(speciality);
+        given(specialtyRepository.findAll()).willReturn(specialitySet);
+
+        // when
+        Set<Speciality> foundSpecialties = service.findAll();
+
+        // then
+        assertThat(specialitySet).hasSize(1);
+        then(specialtyRepository).should().findAll();
+        then(specialtyRepository).shouldHaveNoMoreInteractions();
+    }
+
+    @Test
+    void save() {
+        // given
+        Speciality speciality = new Speciality();
+        given(specialtyRepository.save(any(Speciality.class))).willReturn(speciality);
+
+        // when
+        Speciality savedSpecialty = service.save(speciality);
+
+        // then
+        assertThat(savedSpecialty).isNotNull();
+        then(specialtyRepository).should().save(speciality);
+        then(specialtyRepository).shouldHaveNoMoreInteractions();
     }
 }
